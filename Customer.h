@@ -6,7 +6,8 @@
 #include <regex>
 #include <vector>
 #include <cstring>
-
+#include "Utilities.h"
+#include "BusinessCustomer.h"
 
 
 //#define MAX_LINES 100
@@ -23,14 +24,32 @@ protected:
 	int zipCode;
 	std::string email;
 	std::string status;
-
+	Utilities utilities;
 public:
 	//virtual void updateCustInfo(Customer);
 	//virtual void orderProduct();
 	
 	//User login(std::string, std::string);
 
-	bool test(std::string username, std::string password) {
+	std::vector<std::string> getCustInfo()
+	{
+		std::vector<std::string> custInfo;
+
+		custInfo.push_back(customerName);
+		custInfo.push_back(address);
+		custInfo.push_back(city);
+		custInfo.push_back(state);
+		custInfo.push_back(country);
+		custInfo.push_back(std::to_string(zipCode));
+		custInfo.push_back(email);
+		custInfo.push_back(status);
+		
+		return custInfo;
+
+	}
+
+
+	Customer test(std::string username, std::string password) {
 		std::ifstream myfile;
 		std::vector<std::string> lineWords;
 		std::regex exp(password);
@@ -47,7 +66,7 @@ public:
 						const char* charLine = myline.c_str();
 						int count = std::strlen(charLine);
 						char* accountinfo = const_cast<char*>(charLine);
-						std::vector<std::string> customerInfo = split(accountinfo);
+						std::vector<std::string> customerInfo = utilities.split(accountinfo);
 						
 						
 
@@ -56,7 +75,12 @@ public:
 						cust.password = customerInfo[1];
 						cust.accessLevel = customerInfo[2];
 						
-						return true;
+						if (cust.accessLevel == "1")
+						{
+							BusinessCustomer bus;
+							return bus;
+						}
+						
 					}
 				}
 			}
@@ -67,19 +91,7 @@ public:
 		
 	}
 
-	std::vector<std::string> split(char* things)
-	{
-		char* accountinfo;
-		std::vector<std::string> stuff;
-		accountinfo = std::strtok(things, " ");
-		while (accountinfo != NULL)
-		{
-			stuff.push_back(accountinfo);
-			accountinfo = std::strtok(NULL, " ");
-		}
-
-		return stuff;
-	}
+	
 
 
 	std::string getCustName()
@@ -87,7 +99,7 @@ public:
 		return customerName;
 	}
 
-
+	
 	std::vector<std::string> stringSplit(std::string custInfo)
 	{
 		int count = 0;
