@@ -1,69 +1,72 @@
 #pragma once
-#include <string>
+#include <regex>
 #include <vector>
-#include "Customer.h"
-#include "Product.h"
-#include "Services.h"
+#include <fstream>
+#include <sstream>
+#include <cstring>
 
-class Utilities
-{
+class Utilities {
 public:
-	std::vector<std::string> split(char* things)
+
+	std::vector<std::string> split(const char* charLine)
 	{
-		char* accountinfo;
-		std::vector<std::string> stuff;
-		accountinfo = std::strtok(things, " ");
-		while (accountinfo != NULL)
+		int count = std::strlen(charLine);
+		char* accountInfo = const_cast<char*>(charLine);
+		std::vector<std::string> fileData;
+		accountInfo = std::strtok(accountInfo , " ");
+		while (accountInfo != NULL)
 		{
-			stuff.push_back(accountinfo);
-			accountinfo = std::strtok(NULL, " ");
+			fileData.push_back(accountInfo);
+			accountInfo = std::strtok(NULL, " ");
 		}
 
-		return stuff;
-	} 
+		return fileData;
+	}
 
-	void write(Customer cust, std::string fileName, Product* prod = nullptr, Services* serv = nullptr)
+	void write(std::string fileName, std::string custName, std::vector<std::string> custInfo, std::vector<std::string> productDetails, std::vector<std::string> serviceDetails)
 	{
-
-		std::vector<std::string> productDetails;
-		std::vector<std::string> serviceDetails;
-		std::vector<std::string> custInfo;
+		std::string data = "";
+		std::string error = "";
 
 		std::ofstream outFile;
 		outFile.open(fileName);
 
-		if(prod != nullptr)
-			productDetails = prod->getProductDetails();
-		
-		if (serv != nullptr)
-			serviceDetails = serv->getServiceDetails();
-
-		std::string data = "";
-		
-
-		if (productDetails.size() == 0 && serviceDetails.size() == 0)
+		if (productDetails.size() == 0 && serviceDetails.size() == 0 && custInfo.size() != 0)
 		{
-			custInfo = cust.getCustInfo();
 			for (int i = 0; i < custInfo.size(); i++)
 			{
 				data.append(custInfo[i] + " ");
 			}
 		}
 
-		else if (productDetails.size() != 0 && serviceDetails.size() == 0)
+		else if (productDetails.size() != 0 && serviceDetails.size() == 0 && custInfo.size() == 0)
 		{
-			data.append(cust.getCustName() + " ");
+			data.append(custName + " ");
 
 			for (int i = 0; i < productDetails.size(); i++)
 			{
 				data.append(productDetails[i] + " ");
 			}
-			
+
 		}
 
-		else if (productDetails.size() == 0 && serviceDetails.size() != 0)
+		else if (productDetails.size() == 0 && serviceDetails.size() != 0 && custInfo.size() == 0)
 		{
-			data.append(cust.getCustName() + " ");
+			data.append(custName + " ");
+
+			for (int i = 0; i < serviceDetails.size(); i++)
+			{
+				data.append(serviceDetails[i] + " ");
+			}
+		}
+
+		else if (productDetails.size() != 0 && serviceDetails.size() != 0 && custInfo.size() == 0)
+		{
+			data.append(custName + " ");
+			for (int i = 0; i < productDetails.size(); i++)
+			{
+				data.append(productDetails[i] + " ");
+			}
 
 			for (int i = 0; i < serviceDetails.size(); i++)
 			{
@@ -72,23 +75,49 @@ public:
 		}
 
 		else
-		{
-			data.append(cust.getCustName() + " ");
-			for (int i = 0; i < productDetails.size(); i++)
-			{
-				data.append(productDetails[i] + " ");
-			}
+			error = "Something went wrong";
+		
+		if (error.length() == 0)
+			outFile << data << "\n";
 
-			for (int i = 0; i < serviceDetails.size(); i++)
-			{
-				data.append(serviceDetails[i] + " ");
-			}
-		}
+		else
+			outFile << error << "\n";
 
-		outFile << data << "\n";
-	
 		outFile.close();
 	}
 
-	
+	std::vector<std::string> read(std::string fileName, std::string username, std::string password = "")
+	{
+		std::ifstream myfile;
+		std::regex exp(password);
+		myfile.open(fileName);
+		std::string myline;
+		const char* charLine;
+		int count;
+		char* accountInfo;
+
+		if (myfile.is_open()) {
+			while (myfile.good()) { // equivalent to myfile.good()
+				std::getline(myfile, myline);
+				if (myline.find(username) != std::string::npos) {
+
+					if (password.length() != 0 && std::regex_search(myline, exp))
+					{
+						myfile.close();
+						return split(myline.c_str());
+					}
+
+					else
+					{
+						myfile.close();
+						return split(myline.c_str());
+					}
+				}
+			}
+		}
+
+		myfile.close();
+		return {};
+	}
+
 };

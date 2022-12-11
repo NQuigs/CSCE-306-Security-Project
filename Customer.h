@@ -1,20 +1,28 @@
 #pragma once
-#include "User.h"
-#include <iostream>
+//#include "plog/Initializers/RollingFileInitializer.h"
+//#include "plog/Log.h"
 #include <fstream>
 #include <sstream>
-#include <regex>
-#include <vector>
 #include <cstring>
+#include <regex>
 #include "Utilities.h"
-#include "BusinessCustomer.h"
+#include "User.h"
+#include <iostream>
+#include "Product.h"
+#include "Services.h"
+
+
+
+
+
+using namespace System::Data;
 
 
 //#define MAX_LINES 100
 //#define MAX_LEN 1000
 
 
-class Customer :public User {
+class Customer : public User {
 protected:
 	std::string customerName;
 	std::string address;
@@ -24,7 +32,7 @@ protected:
 	int zipCode;
 	std::string email;
 	std::string status;
-	Utilities utilities;
+	
 public:
 	//virtual void updateCustInfo(Customer);
 	//virtual void orderProduct();
@@ -49,48 +57,10 @@ public:
 	}
 
 
-	Customer test(std::string username, std::string password) {
-		std::ifstream myfile;
-		std::vector<std::string> lineWords;
-		std::regex exp(password);
-		myfile.open("CustAccountInfo.txt");
-		std::string myline;
-
-		if (myfile.is_open()) {
-			while (myfile.good()) { // equivalent to myfile.good()
-				std::getline(myfile, myline);
-				if (myline.find(username) != std::string::npos) {
-
-					if (std::regex_search(myline, exp))
-					{
-						const char* charLine = myline.c_str();
-						int count = std::strlen(charLine);
-						char* accountinfo = const_cast<char*>(charLine);
-						std::vector<std::string> customerInfo = utilities.split(accountinfo);
-						
-						
-
-						Customer cust;
-						cust.customerName = customerInfo[0];
-						cust.password = customerInfo[1];
-						cust.accessLevel = customerInfo[2];
-						
-						if (cust.accessLevel == "1")
-						{
-							BusinessCustomer bus;
-							return bus;
-						}
-						
-					}
-				}
-			}
-		}
-
-		else
-			return false;
-		
+	void setName(std::string name)
+	{
+		customerName = name;
 	}
-
 	
 
 
@@ -116,6 +86,69 @@ public:
 
 
 	}
+
+	
+
+	void getInfoForFile(Customer cust, std::string fileName, Product* prod = nullptr, Services* serv = nullptr)
+	{
+
+		std::vector<std::string> productDetails;
+		std::vector<std::string> serviceDetails;
+		std::vector<std::string> custInfo;
+		std::string custName = "";
+
+		std::ofstream outFile;
+		outFile.open(fileName);
+
+		if (prod != nullptr)
+			productDetails = prod->getProductDetails();
+
+		if (serv != nullptr)
+			serviceDetails = serv->getServiceDetails();
+
+		if (prod == nullptr && serv == nullptr)
+			custInfo = cust.getCustInfo();
+
+		else
+			custName = cust.getCustName();
+		
+		util.write(fileName, custName, custInfo, productDetails, serviceDetails);
+
+	}
+
+
+	//StringDictionary getOrderInfo(Customer* cust = nullptr)
+	//{
+	//	std::string data;
+	//	std::ifstream myFile;
+	//	StringDictionary sd;
+
+	//	myFile.open("OrderInfo.txt");
+	//	std::unordered_map<std::string, std::string> test;
+	//	if (myFile.is_open())
+	//	{
+	//		while (myFile.good())
+	//		{
+	//			if (cust != nullptr)
+	//			{
+	//				std::getline(myFile, data, ' ');
+	//				sd.Add("CustomerName", msclr::interop::marshal_as<System::String^>(data));
+	//				std::getline(myFile, data, ' ');
+	//				sd.Add("ProductName", msclr::interop::marshal_as<System::String^>(data));
+	//				std::getline(myFile, data, ' ');
+	//				sd.Add("ProductPrice", msclr::interop::marshal_as<System::String^>(data));
+	//				
+	//				IEnumerable<int>
+	//				
+
+	//				return ;
+	//			}
+	//		}
+
+	//	}
+	//}
+
+
 
 };
 
