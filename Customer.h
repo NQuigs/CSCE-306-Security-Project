@@ -1,11 +1,9 @@
 #pragma once
-//#include "plog/Initializers/RollingFileInitializer.h"
-//#include "plog/Log.h"
+
 #include <fstream>
 #include <sstream>
 #include <cstring>
 #include <regex>
-#include "Utilities.h"
 #include "User.h"
 #include <iostream>
 #include "Product.h"
@@ -69,23 +67,23 @@ public:
 		return customerName;
 	}
 
-	
-	std::vector<std::string> stringSplit(std::string custInfo)
-	{
-		int count = 0;
-		std::vector<std::string> customerStuff;
-		for (int i = 0; i < custInfo.length(); i++)
-		{
-			if (custInfo[i].Equals(' '))
-			{
-				customerStuff.push_back(custInfo.substr(0, i - 1));
-				//custInfo = custInfo.erase(custInfo.begin(), custInfo.find_first_of(' '))
-			}
-		}
+	//
+	//std::vector<std::string> stringSplit(std::string custInfo)
+	//{
+	//	int count = 0;
+	//	std::vector<std::string> customerStuff;
+	//	for (int i = 0; i < custInfo.length(); i++)
+	//	{
+	//		if (custInfo[i].Equals(' '))
+	//		{
+	//			customerStuff.push_back(custInfo.substr(0, i - 1));
+	//			//custInfo = custInfo.erase(custInfo.begin(), custInfo.find_first_of(' '))
+	//		}
+	//	}
 
 
 
-	}
+	//}
 
 	
 
